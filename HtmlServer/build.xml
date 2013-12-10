@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Helium Http Server" basedir="." default="tar">
+
+	<description>This is example of Ant buildfile</description>
+
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="web.dir" value="web" />
+	<property name="bin.dir" value="bin" />
+	<property name="config.dir" value="cfg" />
+	<property name="build.dir" value="tmp" />
+	<property name="jar.dir" value="jar" />
+	<property name="dist.dir" value="dist" />
+	<property name="helium.dir" value="helium" />
+	<property name="jarName" value="helium.jar" />
+
+	<property name="main-class" value="si.matjazcerkvenik.helium.ServerStart" />
+	<property name="version" value="1.0.0" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${jar.dir}" />
+		<mkdir dir="${jar.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<delete dir="${dist.dir}/${helium.dir}-${version}" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}" />
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" encoding="UTF-8" debug="on" debuglevel="lines,source" />
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${jar.dir}" />
+		<tstamp>
+			<format property="TODAY" pattern="dd.MM.yyyy hh:mm" />
+		</tstamp>
+		<jar destfile="${jar.dir}/${jarName}" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0" />
+				<attribute name="Creation-Date" value="${TODAY}" />
+				<attribute name="Created-By" value="Matjaz Cerkvenik" />
+				<attribute name="Main-Class" value="${main-class}" />
+				<attribute name="Class-Path" value="simple-logger-1.2.jar" />
+				<attribute name="Content" value="${ant.project.name}" />
+				<attribute name="Project-Version" value="${version}" />
+				<attribute name="Compiled-By" value="${ant.java.version}" />
+			</manifest>
+		</jar>
+		<!-- <copy todir="${dist.dir}"> -->
+			<!-- <fileset dir="${lib.dir}"> -->
+				<!-- <include name="**/*.jar" /> -->
+			<!-- </fileset> -->
+		<!-- </copy> -->
+		<echo message="= building successful =" />
+	</target>
+
+	<target name="run">
+		<antcall target="jar" />
+		<java fork="true" classname="${main-class}">
+			<classpath>
+				<path refid="classpath" />
+				<path location="${dist.dir}/${helium.dir}-${version}/lib/${jarName}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="tar" depends="jar">
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}/bin" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}/cfg" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}/lib" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}/log" />
+		<mkdir dir="${dist.dir}/${helium.dir}-${version}/web" />
+		
+		<copy todir="${dist.dir}/${helium.dir}-${version}/bin">
+			<fileset dir="${bin.dir}">
+				<include name="startHelium.sh" />
+				<include name="stopHelium.sh" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${helium.dir}-${version}/cfg">
+			<fileset dir="${config.dir}">
+				<include name="server.properties" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${helium.dir}-${version}/lib">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+				<!-- <include name="logback-classic-0.9.29.jar" /> -->
+				<!-- <include name="logback-core-0.9.29.jar" /> -->
+				<!-- <include name="slf4j-api-1.6.2.jar" /> -->
+			</fileset>
+			<fileset dir="${jar.dir}">
+				<include name="${jarName}" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${helium.dir}-${version}/web">
+			<fileset dir="${web.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<tar destfile="${dist.dir}/${helium.dir}-${version}.tar.gz" basedir="${dist.dir}" includes="${helium.dir}-${version}/**" compression="gzip" />
+	</target>
+
+</project>
