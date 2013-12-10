@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#div1 {
+width:220px;
+padding:10px;
+border:1px solid gray;
+margin:0px;
+}
+#div2 {
+width:320px;
+padding:10px;
+border:1px solid gray;
+margin:0px;
+}
+.div2a {
+float:left;
+width:50px;
+padding:10px;
+border:1px solid blue;
+margin:0px;
+}
+#div3 {
+width:420px;
+padding:10px;
+border:1px solid gray;
+margin:0px;
+}
+div.clear {
+clear:both;
+}
+</style>
+</head>
+
+<body>
+
+<div id="div1">The total width of this element is 250px.</div>
+<div id="div2">
+	<div class="div2a">Inner div</div>
+	<div class="div2a">Inner div</div>
+	<div class="div2a">Inner div</div>
+	<div class="clear"></div>
+</div>
+<div id="div3">The total width of this element is 450px.</div>
+
+</body>
+</html>

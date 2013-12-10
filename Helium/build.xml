@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="HTML Library for Java" basedir="." default="tar">
+
+	<description>Library of HTML elements</description>
+	
+	<property name="project.name" value="helium" />
+	<property name="project.version" value="0.0.1" />
+
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="jar.dir" value="jar" />
+	<property name="dist.dir" value="dist" />
+	<property name="doc.dir" value="doc" />
+	<property name="jar.name" value="${project.name}-${project.version}.jar" />
+	
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${jar.dir}" />
+		<delete dir="${doc.dir}" />
+		<delete dir="${dist.dir}/${project.name}-${project.version}" />
+		<echo message="== project cleaned ==" />
+	</target>
+	
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" encoding="UTF-8" debug="on" debuglevel="lines,source" />
+		<echo message="== compiling successful ==" />
+	</target>
+	
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${jar.dir}" />
+		<tstamp>
+			<format property="TODAY" pattern="dd.MM.yyyy hh:mm" />
+		</tstamp>
+		<jar destfile="${jar.dir}/${jar.name}" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0" />
+				<attribute name="Creation-Date" value="${TODAY}" />
+				<attribute name="Created-By" value="Matjaz Cerkvenik" />
+				<attribute name="Main-Class" value="" />
+				<attribute name="Class-Path" value="" />
+				<attribute name="Content" value="${ant.project.name}" />
+				<attribute name="Project-Version" value="${project.version}" />
+				<attribute name="Compiled-By" value="${ant.java.version}" />
+			</manifest>
+		</jar>
+		<echo message="== building successful ==" />
+	</target>
+	
+	
+	<target name="javadoc" depends="jar" description="generate documentation">
+		<mkdir dir="${doc.dir}" />
+		<javadoc sourcepath="${src.dir}" destdir="${doc.dir}"/>
+		<echo message="== javadoc generated ==" />
+	</target>
+	
+
+	<target name="tar" depends="javadoc">
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${dist.dir}/${project.name}-${project.version}" />
+		<mkdir dir="${dist.dir}/${project.name}-${project.version}/src" />
+		<mkdir dir="${dist.dir}/${project.name}-${project.version}/lib" />
+		<mkdir dir="${dist.dir}/${project.name}-${project.version}/javadoc" />
+		
+		<copy todir="${dist.dir}/${project.name}-${project.version}/lib">
+			<fileset dir="${jar.dir}">
+				<include name="${jar.name}" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${project.name}-${project.version}/src">
+			<fileset dir="${src.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${project.name}-${project.version}/javadoc">
+			<fileset dir="${doc.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/${project.name}-${project.version}">
+			<fileset dir=".">
+				<include name="build.xml" />
+			</fileset>
+		</copy>
+		
+		<tar destfile="${dist.dir}/${project.name}-${project.version}.tar.gz" basedir="${dist.dir}" includes="${project.name}-${project.version}/**" compression="gzip" />
+		
+		<echo message="== building tar file successful ==" />
+	</target>
+
+</project>
